@@ -1,9 +1,14 @@
 /**
  * @file assignment2.cc
  *
- * @brief Explain briefly.
+ * @brief Demonstrates the implementation of a Gaussian distribution.
  *
- * Further explanation, if required.
+ * This file defines a Gaussian class for representing and manipulating a
+ * Gaussian distribution. It includes member functions to compute the
+ * probability density function (PDF) and cumulative distribution function
+ * (CDF) using various methods (numerical integration, error function, and
+ * polynomial approximation). It also demonstrates the use of copy constructors,
+ * assignment operators, and free functions.
  *
  * @author Ion Lipsiuc
  * @date 2025-02-19
@@ -17,30 +22,31 @@
 const double MYPI{4 * std::atan(1.0)};
 
 /**
- * @class
+ * @class Gaussian
  *
- * @brief Explain briefly.
+ * @brief A class for representing a Gaussian distribution.
  *
- * Further explanation, if required.
+ * The Gaussian class encapsulates the properties of a Gaussian distribution
+ * including its mean and standard deviation. It provides methods to compute the
+ * PDF and CDF using numerical integration, the complementary error function,
+ * and a polynomial approximation. Additionally, it supports copy construction
+ * and assignment.
  */
 class Gaussian {
 public:
   /**
-   * @brief Explain briefly.
-   *
-   * Further explanation, if required.
+   * @brief Default constructor.
    */
   Gaussian() : mu{0.0}, sigma{1.0} {
     std::cout << "Constructing default with mean 0.0, stdev 1.0" << std::endl;
   }
 
   /**
-   * @brief Explain briefly.
+   * @brief Constructs a Gaussian distribution with a given mean and standard
+   * deviation.
    *
-   * Further explanation, if required.
-   *
-   * @param[in] mean Explain briefly.
-   * @param[in] stdev Explain briefly.
+   * @param[in] mean The mean of the distribution.
+   * @param[in] stdev The standard deviation of the distribution.
    */
   Gaussian(double const mean, double const stdev) : mu{mean}, sigma{stdev} {
     std::cout << "Constructing with mean " << mean << ", stdev " << stdev
@@ -48,34 +54,29 @@ public:
   }
 
   /**
-   * @brief Explain briefly.
+   * @brief Retrieves the mean of the distribution.
    *
-   * Further explanation, if required.
-   *
-   * @returns
+   * @returns The mean of the Gaussian distribution.
    */
   double get_mu() const { return mu; }
 
   /**
-   * @brief Explain briefly.
+   * @brief Retrieves the standard deviation of the distribution.
    *
-   * Further explanation, if required.
-   *
-   * @returns
+   * @returns The standard deviation of the Gaussian distribution.
    */
   double get_sigma() const { return sigma; }
 
   /**
-   * @brief Explain briefly.
+   * @brief Normalises a given value with respect to the distribution.
    *
-   * Further explanation, if required.
+   * @param[in] x The value to be normalised.
    *
-   * @param[in] x Explain briefly.
-   *
-   * @returns
+   * @returns The normalised value.
    */
   double normalised(double const x) const { return (x - mu) / sigma; }
 
+  // Prototypes
   Gaussian(const Gaussian &rhs);
   Gaussian &operator=(const Gaussian &rhs);
   double pdf(double const x) const;
@@ -84,35 +85,36 @@ public:
   double cdf_erfc(double const x) const;
   void print_parameters() const;
   double cdf_poly(double const x) const;
+
   ~Gaussian() {
     std::cout << "Destroying object with mu = " << mu << " stdev = " << sigma
               << "\n";
   }
 
 private:
-  double mu;
-  double sigma;
+  double mu;    // The mean of the distribution
+  double sigma; // The standard deviation of the distribution.
 };
 
 /**
- * @brief Explain briefly.
+ * @brief Copy constructor.
  *
- * Further explanation, if required.
+ * Creates a new Gaussian object as a copy of an exisiting one.
  *
- * @param[in] rhs Explain briefly.
+ * @param[in] rhs The Gaussian object to be copied.
  */
 Gaussian::Gaussian(const Gaussian &rhs) : mu(rhs.mu), sigma(rhs.sigma) {
   std::cout << "Copy constructor" << std::endl;
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Copy assignment operator.
  *
- * Further explanation, if required.
+ * Assigns the values from the provided Gaussian object to the current object.
  *
- * @param[in] rhs Explain briefly.
+ * @param[in] rhs The Gaussian object whose values are to be assigned.
  *
- * @returns
+ * @returns A reference to the current object.
  */
 Gaussian &Gaussian::operator=(const Gaussian &rhs) {
   if (this != &rhs) {
@@ -123,13 +125,12 @@ Gaussian &Gaussian::operator=(const Gaussian &rhs) {
   return *this;
 }
 
+// Prototypes
 void print_parameters(const Gaussian &dist);
 double pdf(const Gaussian &dist, double x);
 
 /**
- * @brief Explain briefly.
- *
- * Further explanation, if required.
+ * @brief Prints the parameters of the Gaussian distribution.
  */
 void Gaussian::print_parameters() const {
   std::cout << "Normal distribution with mean " << mu
@@ -137,13 +138,11 @@ void Gaussian::print_parameters() const {
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Computes the PDF at a given value.
  *
- * Further explanation, if required.
+ * @param[in] x The value at which to evaluate the PDF.
  *
- * @param[in] x Explain briefly.
- *
- * @returns
+ * @returns The computed PDF value.
  */
 double Gaussian::pdf(double const x) const {
   return (1.0 / (sigma * std::sqrt(2 * MYPI))) *
@@ -151,13 +150,12 @@ double Gaussian::pdf(double const x) const {
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Computes the CDF at a given value using the complementary error
+ * function.
  *
- * Further explanation, if required.
+ * @param[in] x The value at which to evaluate the CDF.
  *
- * @param[in] x Explain briefly.
- *
- * @returns
+ * @returns The CDF value.
  */
 double Gaussian::cdf_erfc(double const x) const {
   double z = normalised(x);
@@ -165,13 +163,11 @@ double Gaussian::cdf_erfc(double const x) const {
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Compute the CDF at a given value using numerical integration.
  *
- * Further explanation, if required.
- *
- * @param[in] x Explain briefly.
- * @param[in] left Explain briefly.
- * @param[in] step Explain briefly.
+ * @param[in] x The value at which to evaluate the CDF.
+ * @param[in] left The lower bound for integration.
+ * @param[in] step The integration step size.
  *
  * @returns
  */
@@ -187,13 +183,11 @@ double Gaussian::cdf(double const x, double const left,
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Computes the CDF using a polynomial approximation.
  *
- * Further explanation, if required.
+ * @param[in] x The value at which to evaluate the CDF.
  *
- * @param[in] x Explain briefly.
- *
- * @returns
+ * @returns The approximate CDF value.
  */
 double Gaussian::cdf_poly(const double x) const {
   const double norm{normalised(x)};
@@ -235,11 +229,12 @@ double Gaussian::cdf_poly(const double x) const {
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Prints the parameters of a Gaussian distribution.
  *
- * Further explanation, if required.
+ * This free function outputs the mean and standard deviation of the provided
+ * Gaussian object.
  *
- * @param[in] dist Explain briefly.
+ * @param[in] dist The Gaussian distribution whose parameters are to be printed.
  */
 void print_parameters(const Gaussian &dist) {
   std::cout << "Normal distribution with mean " << dist.get_mu()
@@ -247,21 +242,23 @@ void print_parameters(const Gaussian &dist) {
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Computes the PDF at a given value.
  *
- * Further explanation, if required.
+ * Calls the member function on the Gaussian object.
  *
- * @param[in] dist Explain briefly.
- * @param[in] x Explain briefly.
+ * @param[in] dist The Gaussian distribution object.
+ * @param[in] x The value at which to compute the PDF.
  *
- * @returns
+ * @returns The computed PDF value.
  */
 double pdf(const Gaussian &dist, double const x) { return dist.pdf(x); }
 
 /**
  * @brief Main function.
  *
- * Further explanation, if required.
+ * Demonstrates the use of the Gaussian class by creating instances, displaying
+ * their parameters, and computing the CDF using various methods. It also
+ * demonstrates copy construction, assignment, and the use of free functions.
  *
  * @returns 0 upon successful execution.
  */
