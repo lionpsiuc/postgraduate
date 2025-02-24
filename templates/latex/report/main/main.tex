@@ -1,0 +1,25 @@
+\documentclass[12pt]{article}
+
+\input{../preamble/preamble.tex}
+
+\title{Title\\\vspace{0.5cm}\large Subtitle}
+\author{Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}\noindent This abstract provides a concise summary of the report, outlining its key objectives, methodology, and findings to give the reader a quick overview of the content.\end{abstract}
+
+\tableofcontents
+\newpage
+
+\input{../sections/introduction/introduction.tex}
+% Further sections here using \input{../sections/section/section.tex} command
+\input{../sections/conclusion/conclusion.tex}
+
+\bibliographystyle{plainnat}
+\bibliography{../references}
+
+\end{document}
