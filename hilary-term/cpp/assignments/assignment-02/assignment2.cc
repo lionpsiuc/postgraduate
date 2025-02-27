@@ -110,7 +110,8 @@ Gaussian::Gaussian(const Gaussian &rhs) : mu(rhs.mu), sigma(rhs.sigma) {
 /**
  * @brief Copy assignment operator.
  *
- * Assigns the values from the provided Gaussian object to the current object.
+ * Assigns the values from the provided Gaussian object to the current
+ * object.
  *
  * @param[in] rhs The Gaussian object whose values are to be assigned.
  *
