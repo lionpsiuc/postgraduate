@@ -6,9 +6,8 @@
  * This file defines a Gaussian class for representing and manipulating a
  * Gaussian distribution. It includes member functions to compute the
  * probability density function (PDF) and cumulative distribution function
- * (CDF) using various methods (numerical integration, error function, and
- * polynomial approximation). It also demonstrates the use of copy constructors,
- * assignment operators, and free functions.
+ * (CDF). It also demonstrates the use of copy constructors, assignment
+ * operators, and free functions.
  *
  * @author Ion Lipsiuc
  * @date 2025-02-19
@@ -28,9 +27,7 @@ const double MYPI{4 * std::atan(1.0)};
  *
  * The Gaussian class encapsulates the properties of a Gaussian distribution
  * including its mean and standard deviation. It provides methods to compute the
- * PDF and CDF using numerical integration, the complementary error function,
- * and a polynomial approximation. Additionally, it supports copy construction
- * and assignment.
+ * PDF and CDF. Additionally, it supports copy construction and assignment.
  */
 class Gaussian {
 public:
@@ -86,6 +83,7 @@ public:
   void print_parameters() const;
   double cdf_poly(double const x) const;
 
+  // Destructor
   ~Gaussian() {
     std::cout << "Destroying object with mu = " << mu << " stdev = " << sigma
               << "\n";
@@ -170,7 +168,7 @@ double Gaussian::cdf_erfc(double const x) const {
  * @param[in] left The lower bound for integration.
  * @param[in] step The integration step size.
  *
- * @returns
+ * @returns The computed CDF value.
  */
 double Gaussian::cdf(double const x, double const left,
                      double const step) const {
@@ -269,7 +267,7 @@ int main() {
   auto list = {-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0};
   std::cout << std::fixed << "\n";
   A.print_parameters();
-  std::cout << std::setw(60) << std::setfill('-') << '\n' << std::setfill(' ');
+  std::cout << std::setw(60) << std::setfill('-') << "\n" << std::setfill(' ');
   std::cout << "  x           Phi(x)             Method \n";
   for (auto i : list) {
     std::cout << std::setw(4) << std::setprecision(1) << i << "\t"

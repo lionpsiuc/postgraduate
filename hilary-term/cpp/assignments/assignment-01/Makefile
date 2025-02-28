@@ -14,3 +14,4 @@ $(EXES): %: %.cc
 .PHONY: clean
 clean:
 	$(RM) $(EXES) x-positive.txt y-even.txt
+	

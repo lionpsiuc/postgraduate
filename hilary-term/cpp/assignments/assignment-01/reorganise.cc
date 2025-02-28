@@ -99,7 +99,7 @@ void read_array_from_file(std::string const &filename, double v[],
                           std::size_t const n) {
   std::ifstream infile{filename}; // Open file for reading
   if (!infile.is_open()) {        // Check if file opening failed
-    std::cerr << "Error opening " << filename << '\n';
+    std::cerr << "Error opening " << filename << "\n";
     std::exit(EXIT_FAILURE);
   }
   for (std::size_t i = 0; i < n; ++i) {
@@ -119,7 +119,7 @@ void read_array_from_file(std::string const &filename, int v[],
                           std::size_t const n) {
   std::ifstream infile{filename}; // Open file for reading
   if (!infile.is_open()) {        // Check if file opening failed
-    std::cerr << "Error opening " << filename << '\n';
+    std::cerr << "Error opening " << filename << "\n";
     std::exit(EXIT_FAILURE);
   }
   for (std::size_t i = 0; i < n; ++i) {
@@ -139,11 +139,11 @@ void write_array_to_file(std::string const &filename, double const v[],
                          std::size_t const n) {
   std::ofstream outfile{filename}; // Open file for writing
   if (!outfile.is_open()) {        // Check if file opening failed
-    std::cerr << "Error opening " << filename << '\n';
+    std::cerr << "Error opening " << filename << "\n";
     std::exit(EXIT_FAILURE);
   }
   for (std::size_t i = 0; i < n; ++i) {
-    outfile << v[i] << '\n'; // Write each value to the file
+    outfile << v[i] << "\n"; // Write each value to the file
   }
   outfile.close(); // Close the file
 }
@@ -159,11 +159,11 @@ void write_array_to_file(std::string const &filename, int const v[],
                          std::size_t const n) {
   std::ofstream outfile{filename}; // Open file for writing
   if (!outfile.is_open()) {        // Check if file opening failed
-    std::cerr << "Error opening " << filename << '\n';
+    std::cerr << "Error opening " << filename << "\n";
     std::exit(EXIT_FAILURE);
   }
   for (std::size_t i = 0; i < n; ++i) {
-    outfile << v[i] << '\n'; // Write each value to the file
+    outfile << v[i] << "\n"; // Write each value to the file
   }
   outfile.close(); // Close the file
 }
