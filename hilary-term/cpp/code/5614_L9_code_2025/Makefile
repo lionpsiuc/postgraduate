@@ -5,7 +5,7 @@
 #
 
 
-objects :=   vector_move vector_example no_template template template2 template3 template4 template5 template_ol # move 
+objects :=   vector_move vector_example no_template template # move 
 
 CXXFLAGS:= -Wextra -Wall --std=c++23
 CXX 	:= g++
