@@ -1,0 +1,7 @@
+root = true
+
+[*.{c,cc,cpp,cu,h,md,py}]
+insert_final_newline = true
+
+[Makefile]
+insert_final_newline = true
