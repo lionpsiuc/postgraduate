@@ -1,16 +1,17 @@
 {
   "editor.formatOnSave": true,
   "clang-format.executable": "/usr/bin/clang-format",
-  "[c]": {
-    "editor.defaultFormatter": "xaver.clang-format"
+  "files.associations": {
+    "*.cc": "cpp",
+    "*.cu": "cpp"
   },
-  "[cc]": {
+  "[c]": {
     "editor.defaultFormatter": "xaver.clang-format"
   },
   "[cpp]": {
     "editor.defaultFormatter": "xaver.clang-format"
   },
-  "[cu]": {
+  "[h]": {
     "editor.defaultFormatter": "xaver.clang-format"
   },
   "[python]": {
