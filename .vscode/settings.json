@@ -1,4 +1,7 @@
 {
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 80,
+  "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "clang-format.executable": "/usr/bin/clang-format",
   "files.associations": {
