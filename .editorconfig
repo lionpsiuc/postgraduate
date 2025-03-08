@@ -1,6 +1,6 @@
 root = true
 
-[*.{c,cc,cpp,cu,h,md,py}]
+[*.{c,cc,cpp,cu,h,md,py,txt}]
 insert_final_newline = true
 
 [Makefile]
