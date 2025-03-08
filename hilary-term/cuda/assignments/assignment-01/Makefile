@@ -1,80 +1,85 @@
-# Compilers and commands
+# Compilers
 CC = gcc
-CXX = g++
 NVCC = nvcc
-LINK = nvcc
-DEL_FILE = rm -f
 
 # Flags
-CFLAGS = -Wall -O3 -lm
-CXXFLAGS = -Wall -O3
+CFLAGS = -std=c2x -Wall -Wextra -O3 -lm -D_POSIX_C_SOURCE=199309L -D_GNU_SOURCE
 NVCCFLAGS = -O4 --use_fast_math --compiler-options -funroll-loops -arch=sm_75
 
-# Libraries
-LIBS = -lm
+# Directories
+SINGLEDIR = .
+DOUBLEDIR = ./double
+OBJDIR = obj
 
-# Include paths
-INCPATH = /usr/include/
+# Source files
+SINGLE_C = $(wildcard $(SINGLEDIR)/*.c)
+DOUBLE_C = $(wildcard $(DOUBLEDIR)/*.c)
+SINGLE_CUDA = $(wildcard $(SINGLEDIR)/*.cu)
+DOUBLE_CUDA = $(wildcard $(DOUBLEDIR)/*.cu)
 
-# Files
-OBJECTS = main.o matrix_ops.o matrix_ops_cuda.o
+# Object files
+SINGLE_OBJS_C = $(patsubst $(SINGLEDIR)/%.c, $(OBJDIR)/%.o, $(SINGLE_C))
+DOUBLE_OBJS_C = $(patsubst $(DOUBLEDIR)/%.c, $(OBJDIR)/%.o, $(DOUBLE_C))
+SINGLE_OBJS_CUDA = $(patsubst $(SINGLEDIR)/%.cu, $(OBJDIR)/%.o, $(SINGLE_CUDA))
+DOUBLE_OBJS_CUDA = $(patsubst $(DOUBLEDIR)/%.cu, $(OBJDIR)/%.o, $(DOUBLE_CUDA))
 
-TARGET = matrix_reduce
+# Combined object files for each target
+SINGLE_OBJS = $(SINGLE_OBJS_C) $(SINGLE_OBJS_CUDA)
+DOUBLE_OBJS = $(DOUBLE_OBJS_C) $(DOUBLE_OBJS_CUDA)
 
-all: $(TARGET)
+# Executable targets
+SINGLE_TARGET = main-single
+DOUBLE_TARGET = main-double
 
-$(TARGET): $(OBJECTS)
-	$(LINK) $(OBJECTS) -o $(TARGET) $(LIBS)
+# Default target
+all: $(SINGLE_TARGET) $(DOUBLE_TARGET)
 
-main.o: main.c matrix_ops.h matrix_ops_cuda.h
-	$(CC) -c main.c $(CFLAGS)
+# Link the final executables
+$(SINGLE_TARGET): $(SINGLE_OBJS) | $(OBJDIR)
+	$(NVCC) $(SINGLE_OBJS) -o $@
+$(DOUBLE_TARGET): $(DOUBLE_OBJS) | $(OBJDIR)
+	$(NVCC) $(DOUBLE_OBJS) -o $@
 
-matrix_ops.o: matrix_ops.c matrix_ops.h
-	$(CC) -c matrix_ops.c $(CFLAGS)
+# Compile C source files
+$(OBJDIR)/%.o: $(SINGLEDIR)/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: $(DOUBLEDIR)/%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-matrix_ops_cuda.o: matrix_ops_cuda.cu matrix_ops_cuda.h
-	$(NVCC) -c matrix_ops_cuda.cu $(NVCCFLAGS)
+# Compile CUDA source files
+$(OBJDIR)/%.o: $(SINGLEDIR)/%.cu | $(OBJDIR)
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: $(DOUBLEDIR)/%.cu | $(OBJDIR)
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
+# Ensure directory exists
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+# Clean target
+.PHONY: clean
 clean:
-	-$(DEL_FILE) $(OBJECTS) $(TARGET)
+	$(RM) $(SINGLE_TARGET) $(DOUBLE_TARGET) $(SINGLE_OBJS) $(DOUBLE_OBJS) *.csv
+	rm -rf $(OBJDIR) plots
 
-# Task 3 - Performance Testing
-test_perf: $(TARGET)
-	@echo "Running performance tests for Task 3..."
-	./$(TARGET) -n 1000 -m 1000 -b 4 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 8 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 16 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 32 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 64 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 128 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 256 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 512 -t -o perf_results.csv
-	./$(TARGET) -n 1000 -m 1000 -b 1024 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 4 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 8 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 16 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 32 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 64 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 128 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 256 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 512 -t -o perf_results.csv
-	./$(TARGET) -n 5000 -m 5000 -b 1024 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 4 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 8 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 16 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 32 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 64 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 128 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 256 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 512 -t -o perf_results.csv
-	./$(TARGET) -n 10000 -m 10000 -b 1024 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 4 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 8 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 16 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 32 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 64 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 128 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 256 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 512 -t -o perf_results.csv
-	./$(TARGET) -n 25000 -m 25000 -b 1024 -t -o perf_results.csv
-	@echo "Performance tests completed. Results in perf_results.csv"
+# For the third task
+.PHONY: task3
+task3: $(SINGLE_TARGET)
+	@for N in 1000 5000 10000 25000; do \
+		for B in 4 8 16 32 64 128 256 512 1024; do \
+			echo "\nRunning with matrix size = $$N x $$N and number of threads per block = $$B..."; \
+			echo "----------------------------------------------------------------------------------"; \
+			./$(SINGLE_TARGET) -n $$N -m $$N -b $$B -t -o results-task3.csv; \
+		done; \
+	done
+	@echo "\nResults saved in results-task3.csv"
+
+# For the fourth task
+.PHONY: task4
+task4: $(DOUBLE_TARGET)
+	@for N in 1000 5000 10000 25000; do \
+			echo "\nRunning with matrix size $$N x $$N and number of threads per block = 256..."; \
+			echo "-------------------------------------------------------------------------------"; \
+			./$(DOUBLE_TARGET) -n $$N -m $$N -b 256 -t -o results-task4.csv; \
+		done
+	@echo "\nResults saved in results-task4.csv"
