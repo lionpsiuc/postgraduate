@@ -19,17 +19,16 @@ We explain how our `tsqr` method follows the mathematical background:
     - **Extracting the Local $R$ Factor**: From the output of `LAPACKE_dgeqrf`, each process extracts its local $R$ (`R_local`) by iterating over the local block and zeroing out the lower triangular part.
     - **Forming the Local $Q$ Factor**: The local $Q$ factor (`Q_local`) is computed by applying the Householder reflectors via `LAPACKE_dorgqr` on the same local block. At this point, each process has:
 
-      - A local orthogonal matrix $Q$.
-      - A local upper triangular matrix $R$.
+        - A local orthogonal matrix $Q$.
+        - A local upper triangular matrix $R$.
 
 3. **Reduction Step**:
 
     - **Gathering Local $R$ Factors**: The local $R$ matrices (each of size $n\times n$) from all processes are gathered on the root process using `MPI_Gather`. This creates a stacked $R$ matrix of size $4n\times n$ (`R_stack`).
-
     - **Global $QR$ on the Stacked $R$ Matrix**: On the root process, a second $QR$ factorisation is applied to the stacked $R$ matrix using `LAPACKE_dgeqrf`. This yields:
 
-      - The final upper triangular matrix $R$ of size $n\times n$ (`R_final`).
-      - An intermediate orthogonal matrix `Q_red_all` (after using `LAPACKE_dorgqr`), which acts as the reduction factor that combines the local $Q$ factors.
+        - The final upper triangular matrix $R$ of size $n\times n$ (`R_final`).
+        - An intermediate orthogonal matrix `Q_red_all` (after using `LAPACKE_dorgqr`), which acts as the reduction factor that combines the local $Q$ factors.
 
     - **Broadcasting the Global Reduction $Q$**: The matrix `Q_red_all` is then broadcasted from the root process to all other processes using `MPI_Bcast`, so every process can update its local $Q$ factor.
 

@@ -79,7 +79,6 @@ public:
     if (newStdDev <= 0) {
       throw std::invalid_argument("Standard deviation must be positive");
     }
-
     stdDev = newStdDev;
     distribution = std::normal_distribution<double>(mean, stdDev);
   }
@@ -87,18 +86,18 @@ public:
 
 int main() {
 
-  // Create a normal distribution with mean 5 and std dev 2
+  // Create a normal distribution
   GaussianDistribution gauss(5.0, 2.0);
 
   // Generate a random sample
   double sample = gauss.sample();
   std::cout << "Random sample: " << sample << std::endl;
 
-  // Calculate PDF at x = 6
+  // Calculate PDF
   double pdf_at_6 = gauss.pdf(6.0);
   std::cout << "PDF at x=6: " << pdf_at_6 << std::endl;
 
-  // Calculate CDF at x = 6
+  // Calculate CDF
   double cdf_at_6 = gauss.cdf(6.0);
   std::cout << "CDF at x=6: " << cdf_at_6 << std::endl;
 
