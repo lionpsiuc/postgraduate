@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 df = pd.read_csv("timing.txt")
 n_values = sorted(df["n"].unique())
 plt.figure(figsize=(12, 8))
@@ -17,8 +18,8 @@ for i, n in enumerate(n_values):
         linewidth=2,
         markersize=8,
     )
-plt.xlabel("Number of rows (m)", fontsize=14)
-plt.ylabel("Time taken (seconds)", fontsize=14)
+plt.xlabel(r"Number of rows $m$", fontsize=14)
+plt.ylabel(r"Time taken $t$", fontsize=14)
 plt.title("Time vs. Number of Rows", fontsize=16)
 plt.xscale("log")
 plt.legend()
