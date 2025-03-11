@@ -20,8 +20,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Computes the sum of absolute values for each row in the matrix
- using
+ * @brief Computes the sum of absolute values for each row in the matrix using
  * the GPU.
  *
  * Parallelises row sum computation across CUDA threads, with each thread

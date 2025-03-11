@@ -10,6 +10,7 @@
 #define LOGGING_H_QYJGNTWO
 #include <source_location>
 
-std::string sourceline(const std::source_location location = std::source_location::current());
+std::string sourceline(
+    const std::source_location location = std::source_location::current());
 
 #endif /* end of include guard: LOGGING_H_QYJGNTWO */

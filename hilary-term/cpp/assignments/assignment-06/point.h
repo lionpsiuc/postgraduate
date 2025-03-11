@@ -8,24 +8,23 @@
  */
 #ifndef POINT_H_OMJSZLDH
 #define POINT_H_OMJSZLDH
+#include <algorithm>
+#include <fstream>
 #include <iomanip>
 #include <vector>
-#include <fstream>
-#include <algorithm>
-
 
 /**
  * @brief Simple structure to store coordinates of a point on the grid
  */
 struct Point {
-    double x;                                      //!< x-coordinate 
-    double y;                                      //!< y-coordinate 
+  double x; //!< x-coordinate
+  double y; //!< y-coordinate
 
-    Point() = default;
-    Point(double inx, double iny) : x{inx}, y{iny}{};  //!< Constructor
+  Point() = default;
+  Point(double inx, double iny) : x{inx}, y{iny} {}; //!< Constructor
 
-    // Write the definition of this in point.cc
-    bool operator==(const Point & rhs);   	
+  // Write the definition of this in point.cc
+  bool operator==(const Point &rhs);
 };
 
 /**
@@ -37,14 +36,14 @@ struct Point {
  *
  * @return      Reference to output stream
  */
-inline std::ostream & operator<<(std::ostream & os,const Point & in){
-    os << std::fixed << std::setw(9) << in.x << ", " << std::setw(9) << in.y;
-    return os; 
+inline std::ostream &operator<<(std::ostream &os, const Point &in) {
+  os << std::fixed << std::setw(9) << in.x << ", " << std::setw(9) << in.y;
+  return os;
 }
 
 // Write the definition of the 3 below functions in point.cc
 void write_to_file(std::string fn, std::vector<Point> pts);
 bool cross_prod(Point p1, Point p2, Point p3);
-void sort_points(std::vector<Point>& points);
+void sort_points(std::vector<Point> &points);
 
 #endif /* end of include guard: POINT_H_OMJSZLDH */
