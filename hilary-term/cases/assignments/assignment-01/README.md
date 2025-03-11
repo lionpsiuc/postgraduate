@@ -19,16 +19,16 @@ The repository is organised in such a way as to address the requirements of the 
 
 Located in `c`, where this folder contains the C code required for the assignment, addressing the second and third question. It is organised as follows:
 
-- **`tsqr.c`**: Implements the communication-avoiding TSQR factorisation using LAPACK routines along with MPI for parallel processing. This file defines a method which performs the local QR factorisations and the subsequent reduction step as described in the lectures.
-- **`timing.c`**: Serves as a test driver that runs the communication-avoiding TSQR implementation for various matrix dimensions. It times the execution of the factorisation for different values of $m$ (number of rows) and $n$ (number of columns), and outputs the results to a file named `timing.txt`.
-- **`plot.py`**: A Python script that reads the timing data from `timing.txt` and generates a plot. The plot visualises the scaling behaviour of the TSQR algorithm.
-- **`Makefile`**: Automates the compilation process for the C files. See [here](#how-to-run) for details on how to compile and run.
+- `tsqr.c`: Implements the communication-avoiding TSQR factorisation using LAPACK routines along with MPI for parallel processing. This file defines a method which performs the local QR factorisations and the subsequent reduction step as described in the lectures.
+- `timing.c`: Serves as a test driver that runs the communication-avoiding TSQR implementation for various matrix dimensions. It times the execution of the factorisation for different values of $m$ (number of rows) and $n$ (number of columns), and outputs the results to a file named `timing.txt`.
+- `plot.py`: A Python script that reads the timing data from `timing.txt` and generates a plot. The plot visualises the scaling behaviour of the TSQR algorithm.
+- `Makefile`: Automates the compilation process for the C files. See [here](#how-to-run) for details on how to compile and run.
 
 #### Python Implementation
 
 Located in `python`. Its structure is as follows:
 
-- **`tsqr.ipynb`**: A Jupyter Notebook that implements the communication-avoiding TSQR factorisation. In this version, the input matrix is divided into four blocks (using Python's slicing capabilities) and the QR decompositions are computed for each block without any parallel programming.
+- `tsqr.ipynb`: A Jupyter Notebook that implements the communication-avoiding TSQR factorisation. In this version, the input matrix is divided into four blocks (using Python's slicing capabilities) and the QR decompositions are computed for each block without any parallel programming.
 
 ##### Dependencies
 
