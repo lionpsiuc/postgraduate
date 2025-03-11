@@ -4,20 +4,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+
 # Create the directory for the plots if it doesn't exist already
 save_dir = "plots"
 os.makedirs(save_dir, exist_ok=True)
 
 
 def simulate_scaled_random_walk(n, T):
-    """_summary_
+    """Simulate a scaled random walk approximating Brownian motion.
 
     Args:
-        n (_type_): _description_
-        T (_type_): _description_
+        n (int): The number of steps in the random walk.
+        T (float): The total time horizon over which the random walk is simulated.
 
     Returns:
-        _type_: _description_
+        numpy.ndarray: A NumPy array representing the simulated random walk, containing the cumulative sum of the scaled random increments.
     """
     steps = np.random.choice([-1, 1], size=n)
     increments = steps * np.sqrt(T / n)
