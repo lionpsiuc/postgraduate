@@ -8,8 +8,8 @@
  * @version 1.0
  */
 
-#ifndef INSTRUMENTS_H_VK2TICXL
-#define INSTRUMENTS_H_VK2TICXL
+#ifndef INSTRUMENTS_H
+#define INSTRUMENTS_H
 #include <iostream>
 #include <vector>
 
@@ -31,9 +31,6 @@ public:
 
   /**
    * @brief Default constructor.
-   *
-   * Initialises a trade with zero cost and prints a message stating that the
-   * constructor was called.
    */
   Trade() : cost{0} {
     std::cout << "Trade (base class) Constructor (Default)\n";
@@ -42,9 +39,6 @@ public:
   /**
    * @brief Parameterised constructor.
    *
-   * Initialises a trade with the given cost and prints a message stating that
-   * the constructor was called.
-   *
    * @param[in] cost The price or premium paid to enter the trade.
    */
   Trade(double const cost) : cost{cost} {
@@ -52,44 +46,39 @@ public:
   }
 
   /**
-   * @brief Descructor.
-   *
-   * Ensures that the derived class destructors are called correctly and outputs
-   * a message indicating that the destructor was called.
+   * @brief Destructor.
    */
   virtual ~Trade() { std::cout << "Trade (base class) Destructor\n"; }
 
   /**
    * @brief Pure virtual function to calculate the trade's payoff.
    *
-   * Further explanation, if required.
+   * @param[in] S_T Price of the underlying asset at maturity.
    *
-   * @param[] S_T Explain briefly.
+   * @returns The payoff of the trade.
    */
   virtual double payoff(double const S_T) const = 0;
 
   /**
-   * @brief Explain briefly.
+   * @brief Friend function to calculate total portfolio payoff.
    *
-   * Further explanation, if required.
+   * @param[in] trades Vector of pointers to Trade objects representing the
+   * portfolio.
+   * @param[in] S_T Price of the underlying asset at maturity.
    *
-   * @param[] trades Explain briefly.
-   * @param[] S_T Explain briefly.
-   *
-   * @returns
+   * @returns The total payoff of the portfolio.
    */
   friend double portfolio_payoff(std::vector<Trade const *> const &trades,
                                  double const S_T);
 
   /**
-   * @brief Explain briefly.
+   * @brief Friend function to calculate total portfolio profit.
    *
-   * Further explanation, if required.
+   * @param[in] trades Vector of pointers to Trade objects representing the
+   * portfolio.
+   * @param[in] S_T Price of the underlying asset at maturity.
    *
-   * @param[] trades Explain briefly.
-   * @param[] S_T Explain briefly.
-   *
-   * @returns
+   * @returns The total profit of the portfolio.
    */
   friend double portfolio_profit(std::vector<Trade const *> const &trades,
                                  double const S_T);
@@ -99,9 +88,7 @@ private:
 };
 
 /**
- * @brief Explain briefly.
- *
- * Further explanation, if required.
+ * @brief Class representing a forward contract.
  */
 class Forward : public Trade {
 public:
@@ -109,11 +96,9 @@ public:
   Forward() = delete;
 
   /**
-   * @brief Explain briefly.
+   * @brief Parameterised constructor.
    *
-   * Further explanation, if required.
-   *
-   * @param[] fp Explain briefly.
+   * @param[in] fp Price agreed to buy the underlying asset at maturity.
    */
   Forward(double fp) : Trade(), forward_price{fp} {
     std::cout << "Constructor for Forward with forward price " << forward_price
@@ -121,9 +106,7 @@ public:
   }
 
   /**
-   * @brief Explain briefly.
-   *
-   * Further explanation, if required.
+   * @brief Destructor.
    */
   ~Forward() override {
     std::cout << "Deleting Forward with forward price " << forward_price
@@ -131,13 +114,11 @@ public:
   }
 
   /**
-   * @brief Explain briefly.
+   * @brief Calculate the payoff for a forward contract.
    *
-   * Further explanation, if required.
+   * @param[in] S_T Price of the underlying asset at maturity.
    *
-   * @param[] S_T Explain briefly.
-   *
-   * @returns
+   * @returns The payoff of the forward contract.
    */
   double payoff(double const S_T) const override final {
     return S_T - forward_price;
@@ -149,9 +130,7 @@ private:
 };
 
 /**
- * @brief Explain briefly.
- *
- * Further explanation, if required.
+ * @brief Class representing a call option.
  */
 class Call : public Trade {
 public:
@@ -159,12 +138,10 @@ public:
   Call() = delete;
 
   /**
-   * @brief Explain briefly.
+   * @brief Parameterised constructor.
    *
-   * Further explanation, if required.
-   *
-   * @param[] cost Explain briefly.
-   * @param[] k Explain briefly.
+   * @param[in] cost The premium paid to purchase the contract.
+   * @param[in] k Strike price of the option.
    */
   Call(double cost, double k) : Trade(cost), strike{k} {
     std::cout << "Creating Call with strike " << strike << ". Premium paid "
@@ -172,22 +149,18 @@ public:
   }
 
   /**
-   * @brief Explain briefly.
-   *
-   * Further explanation, if required.
+   * @brief Destructor.
    */
   ~Call() override {
     std::cout << "Destroying Call with strike " << strike << "\n";
   }
 
   /**
-   * @brief Explain briefly.
+   * @brief Calculate the payoff for a call option.
    *
-   * Further explanation, if required.
+   * @param[in] S_T Price of the underlying asset at maturity.
    *
-   * @param[] S_T Explain briefly.
-   *
-   * @returns
+   * @returns The payoff of the call option.
    */
   double payoff(double const S_T) const override final {
     return (S_T > strike) ? (S_T - strike) : 0;
@@ -198,9 +171,7 @@ private:
 };
 
 /**
- * @brief Explain briefly.
- *
- * Further explanation, if required.
+ * @brief Class representing a put option.
  */
 class Put : public Trade {
 public:
@@ -208,12 +179,10 @@ public:
   Put() = delete;
 
   /**
-   * @brief Explain briefly.
+   * @brief Parameterised constructor.
    *
-   * Further explanation, if required.
-   *
-   * @param[] cost Explain briefly.
-   * @param[] k Explain briefly.
+   * @param[in] cost The premium paid to purchase the contract.
+   * @param[in] k Strike price of the option.
    */
   Put(double cost, double k) : Trade(cost), strike{k} {
     std::cout << "Creating Put with strike " << strike << ". Premium paid "
@@ -221,22 +190,18 @@ public:
   }
 
   /**
-   * @brief Explain briefly.
-   *
-   * Further explanation, if required.
+   * @brief Destructor.
    */
   ~Put() override {
     std::cout << "Destroying Put with strike " << strike << "\n";
   }
 
   /**
-   * @brief Explain briefly.
+   * @brief Calculate the payoff for a put option.
    *
-   * Further explanation, if required.
+   * @param[in] S_T Price of the underlying asset at maturity.
    *
-   * @param[] S_T Explain briefly.
-   *
-   * @returns
+   * @returns The payoff of the put option.
    */
   double payoff(double const S_T) const override final {
     return (strike > S_T) ? (strike - S_T) : 0;

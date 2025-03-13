@@ -1,9 +1,7 @@
 /**
  * @file portfolio.cc
  *
- * @brief Explain briefly.
- *
- * Further explanation, if required.
+ * @brief Implementation file for portfolio analysis functions.
  *
  * @author Ion Lipsiuc
  * @date 2025-03-13
@@ -13,14 +11,13 @@
 #include "portfolio.h"
 
 /**
- * @brief Explain briefly.
+ * @brief Friend function to calculate total portfolio payoff.
  *
- * Further explanation, if required.
+ * @param[in] trades Vector of pointers to Trade objects representing the
+ * portfolio.
+ * @param[in] S_T Price of the underlying asset at maturity.
  *
- * @param[] trades Explain briefly.
- * @param[] S_T Explain briefly.
- *
- * @returns
+ * @returns The total payoff of the portfolio.
  */
 double portfolio_payoff(std::vector<Trade const *> const &trades,
                         double const S_T) {
@@ -35,14 +32,13 @@ double portfolio_payoff(std::vector<Trade const *> const &trades,
 }
 
 /**
- * @brief Explain briefly.
+ * @brief Friend function to calculate total portfolio profit.
  *
- * Further explanation, if required.
+ * @param[in] trades Vector of pointers to Trade objects representing the
+ * portfolio.
+ * @param[in] S_T Price of the underlying asset at maturity.
  *
- * @param[] trades Explain briefly
- * @param[] S_T Explain briefly.
- *
- * @returns
+ * @returns The total profit of the portfolio.
  */
 double portfolio_profit(std::vector<Trade const *> const &trades,
                         double const S_T) {

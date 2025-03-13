@@ -1,43 +1,39 @@
 /**
  * @file portfolio.h
  *
- * @brief Explain briefly.
- *
- * Further explanation, if required.
+ * @brief Header file for portfolio analysis functions.
  *
  * @author Ion Lipsiuc
  * @date 2025-03-13
  * @version 1.0
  */
 
-#ifndef STATS_H_5IWZAED1
-#define STATS_H_5IWZAED1
+#ifndef PORTFOLIO_H
+#define PORTFOLIO_H
 
 #include "instruments.h"
 #include <vector>
 
 /**
- * @brief Explain briefly.
+ * @brief Friend function to calculate total portfolio payoff.
  *
- * Further explanation, if required.
+ * @param[in] trades Vector of pointers to Trade objects representing the
+ * portfolio.
+ * @param[in] S_T Price of the underlying asset at maturity.
  *
- * @param[] trades Explain briefly.
- * @param[] S_T Explain briefly.
- *
- * @returns
+ * @returns The total payoff of the portfolio.
  */
 double portfolio_payoff(std::vector<Trade const *> const &trades,
                         double const S_T);
 
 /**
- * @brief Explain briefly.
+ * @brief Friend function to calculate total portfolio profit.
  *
- * Further explanation, if required.
+ * @param[in] trades Vector of pointers to Trade objects representing the
+ * portfolio.
+ * @param[in] S_T Price of the underlying asset at maturity.
  *
- * @param[] trades Explain briefly.
- * @param[] S_T Explain briefly.
- *
- * @returns
+ * @returns The total profit of the portfolio.
  */
 double portfolio_profit(std::vector<Trade const *> const &trades,
                         double const S_T);
