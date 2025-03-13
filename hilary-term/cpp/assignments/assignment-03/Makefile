@@ -1,22 +1,29 @@
-# Compiler
-CXX = g++
-CXXFLAGS = -std=c++23 -Wall -Wextra
+# Compiler variables
+CXX := g++
+CXXFLAGS := -Wextra -Wall -std=c++23
 
-# Flags
-LDFLAGS =
+# Target executable
+TARGET := assignment3
 
-# Source and object files
-SRCS = $(wildcard *.cc)
-EXES = $(SRCS:.cc=)
+# Object files
+OBJS := portfolio.o assignment3.o
 
 # Default target
-all: $(EXES)
+all: $(TARGET)
 
-# Rule to build each executable
-$(EXES): %: %.cc
-	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
+# Rule to build the executable from object files
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+# Rule to build portfolio.o
+portfolio.o: portfolio.cc portfolio.h instruments.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+# Rule to build assignment3.o
+assignment3.o: assignment3.cc instruments.h portfolio.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 # Clean target
 .PHONY: clean
 clean:
-	$(RM) $(EXES)
+	$(RM) $(TARGET) $(OBJS)
