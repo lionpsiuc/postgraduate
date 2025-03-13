@@ -1,6 +1,6 @@
-# Compiler variables
+# Compiler
 CXX := g++
-CXXFLAGS := -Wextra -Wall -std=c++23
+CXXFLAGS := -std=c++23 -Wextra -Wall
 
 # Target executable
 TARGET := assignment3
@@ -11,7 +11,7 @@ OBJS := portfolio.o assignment3.o
 # Default target
 all: $(TARGET)
 
-# Rule to build the executable from object files
+# Rule to build the executable
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
