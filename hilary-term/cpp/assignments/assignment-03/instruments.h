@@ -10,6 +10,7 @@
 
 #ifndef INSTRUMENTS_H
 #define INSTRUMENTS_H
+
 #include <iostream>
 #include <vector>
 
@@ -37,7 +38,7 @@ public:
   }
 
   /**
-   * @brief Parameterised constructor.
+   * @brief Overloaded constructor.
    *
    * @param[in] cost The price or premium paid to enter the trade.
    */
@@ -96,7 +97,7 @@ public:
   Forward() = delete;
 
   /**
-   * @brief Parameterised constructor.
+   * @brief Overloaded constructor.
    *
    * @param[in] fp Price agreed to buy the underlying asset at maturity.
    */
@@ -112,6 +113,9 @@ public:
     std::cout << "Deleting Forward with forward price " << forward_price
               << "\n";
   }
+
+  // Rule of three, as per the lecture notes
+  Forward &operator=(Forward const &) = default;
 
   /**
    * @brief Calculate the payoff for a forward contract.
@@ -138,7 +142,7 @@ public:
   Call() = delete;
 
   /**
-   * @brief Parameterised constructor.
+   * @brief Overloaded constructor.
    *
    * @param[in] cost The premium paid to purchase the contract.
    * @param[in] k Strike price of the option.
@@ -154,6 +158,9 @@ public:
   ~Call() override {
     std::cout << "Destroying Call with strike " << strike << "\n";
   }
+
+  // Rule of three, as per the lecture notes
+  Call &operator=(Call const &) = default;
 
   /**
    * @brief Calculate the payoff for a call option.
@@ -179,7 +186,7 @@ public:
   Put() = delete;
 
   /**
-   * @brief Parameterised constructor.
+   * @brief Overloaded constructor.
    *
    * @param[in] cost The premium paid to purchase the contract.
    * @param[in] k Strike price of the option.
@@ -195,6 +202,9 @@ public:
   ~Put() override {
     std::cout << "Destroying Put with strike " << strike << "\n";
   }
+
+  // Rule of three, as per the lecture notes
+  Put &operator=(Put const &) = default;
 
   /**
    * @brief Calculate the payoff for a put option.
