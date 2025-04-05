@@ -1,16 +1,27 @@
 /**
  * @file logging.h
  * @brief Header file for logging functions.
- * 		See https://en.cppreference.com/w/cpp/utility/source_location
- * @author R. Morrin
- * @version 3.0
- * @date 2025-02-25
+ *
+ * @author Ion Lipsiuc
+ * @version 1.0
+ * @date 2025-03-30
  */
-#ifndef LOGGING_H_QYJGNTWO
-#define LOGGING_H_QYJGNTWO
-#include <source_location>
 
+#ifndef LOGGING_H
+#define LOGGING_H
+
+#include <source_location>
+#include <string>
+
+/**
+ * @brief Creates a formatted string with source code location information.
+ *
+ * @param[in] location The source location, which defaults to the current
+ *                     location.
+ *
+ * @returns A formatted string with file, line, and function information.
+ */
 std::string sourceline(
     const std::source_location location = std::source_location::current());
 
-#endif /* end of include guard: LOGGING_H_QYJGNTWO */
+#endif
