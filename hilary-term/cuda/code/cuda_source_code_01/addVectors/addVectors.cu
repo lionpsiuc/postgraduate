@@ -1,57 +1,59 @@
 #include "stdio.h"
 
-__global__ void add_arrays_gpu( float *in1, float *in2, float *out, int Ntot) {
-       int idx=blockIdx.x*blockDim.x+threadIdx.x;
-       if ( idx <Ntot )
-       out[idx]=in1[idx]+in2[idx];
+__global__ void add_arrays_gpu(float* in1, float* in2, float* out, int Ntot) {
+  int idx =
+      blockIdx.x * blockDim.x + threadIdx.x; // Set unique ID for each thread
+  if (idx < Ntot)
+    out[idx] = in1[idx] + in2[idx];
 }
 
 int main() {
-	// pointers to host memory
-	float *a, *b, *c;
-	// pointers to device memory
-	float *a_d, *b_d, *c_d;
-	int N=18;
-	int i;
 
-	// Allocate arrays a, b and c on host
-	a = (float*) malloc(N*sizeof(float));
-	b = (float*) malloc(N*sizeof(float));
-	c = (float*) malloc(N*sizeof(float));
+  // Initialise some variables
+  float *a, *b, *c;
+  float *a_d, *b_d, *c_d;
+  int    N = 18;
+  int    i;
 
-	// Allocate arrays a_d, b_d and c_d on device
-	cudaMalloc ((void **) &a_d, sizeof(float)*N);
-	cudaMalloc ((void **) &b_d, sizeof(float)*N);
-	cudaMalloc ((void **) &c_d, sizeof(float)*N);
+  // Allocate memory on the CPU
+  a = (float*) malloc(N * sizeof(float));
+  b = (float*) malloc(N * sizeof(float));
+  c = (float*) malloc(N * sizeof(float));
 
-	// Initialize arrays a and b
-	for (i=0; i<N; i++) {
-		a[i]= (float) 2*i;
-		b[i]=-(float) i;
-	}
+  // Allocate memory on the GPU
+  cudaMalloc((void**) &a_d, sizeof(float) * N);
+  cudaMalloc((void**) &b_d, sizeof(float) * N);
+  cudaMalloc((void**) &c_d, sizeof(float) * N);
 
-	// Copy data from host memory to device memory
-	cudaMemcpy(a_d, a, sizeof(float)*N, cudaMemcpyHostToDevice);
-	cudaMemcpy(b_d, b, sizeof(float)*N, cudaMemcpyHostToDevice);
+  // Create the data
+  for (i = 0; i < N; i++) {
+    a[i] = (float) 2 * i;
+    b[i] = -(float) i;
+  }
 
-	// Compute the execution configuration
-	int block_size=8;
-	dim3 dimBlock(block_size);
-	dim3 dimGrid ( (N/dimBlock.x) + (!(N%dimBlock.x)?0:1) );
+  // Copy data from CPU to GPU (i.e., host to device)
+  cudaMemcpy(a_d, a, sizeof(float) * N, cudaMemcpyHostToDevice);
+  cudaMemcpy(b_d, b, sizeof(float) * N, cudaMemcpyHostToDevice);
 
-	// Add arrays a and b, store result in c
-	add_arrays_gpu<<<dimGrid,dimBlock>>>(a_d, b_d, c_d, N);
+  int  block_size = 8;       // Eight threads per block
+  dim3 dimBlock(block_size); // Block dimension (i.e., 3D)
+  dim3 dimGrid((N / dimBlock.x) +
+               (!(N % dimBlock.x) ? 0 : 1));               // Grid dimension
+  add_arrays_gpu<<<dimGrid, dimBlock>>>(a_d, b_d, c_d, N); // Launch kernel
 
-	// Copy data from deveice memory to host memory
-	cudaMemcpy(c, c_d, sizeof(float)*N, cudaMemcpyDeviceToHost);
+  // Copy results from GPU to CPU (i.e., device to host)
+  cudaMemcpy(c, c_d, sizeof(float) * N, cudaMemcpyDeviceToHost);
 
-	// Print c
-	printf("addVectors will generate two vectors, move them to the global memory, and add them together in the GPU\n");
-	for (i=0; i<N; i++) {
-		printf(" a[%2d](%10f) + b[%2d](%10f) = c[%2d](%10f)\n",i,a[i],i,b[i],i,c[i]);
-	}
+  for (i = 0; i < N; i++) {
+    printf("a[%2d](%10f) + b[%2d](%10f) = c[%2d](%10f)\n", i, a[i], i, b[i], i,
+           c[i]);
+  }
 
-	// Free the memory
-	free(a); free(b); free(c);
-	cudaFree(a_d); cudaFree(b_d);cudaFree(c_d);
+  // Free memory
+  free(a);
+  free(b);
+  free(c);
+  cudaFree(a_d);
+  cudaFree(b_d);
+  cudaFree(c_d);
 }
