@@ -1,1 +1,9 @@
 \section{Discussion}
+
+The transformer model represents a significant paradigm shift in sequence modelling, addressing fundamental limitations of previous architectures by completely replacing recurrence and convolutions with self-attention mechanisms.
+
+Its key advantage is parallelisability. Unlike RNNs that process tokens sequentially, the transformer's self-attention mechanism attends to all positions simultaneously, substantially reducing training time and improving scalability for large datasets. The multi-head attention mechanism enhances this capability by allowing the model to jointly attend to information from different representation subspaces, capturing various aspects from local syntactic patterns to global semantic relationships.
+
+However, the transformer has limitations. Its computational complexity scales quadratically with sequence length, potentially creating inefficiencies for very long sequences as each token must attend to all others. Future research might explore sparse attention patterns or optimisations to address this constraint. Additionally, while effective, the fixed sinusoidal positional encodings might limit flexibility in representing sequential patterns compared to learned embeddings, though experiments showed comparable results with both approaches.
+
+Despite these considerations, the transformer's impact on NLP is profound. Its strong performance with minimal task-specific modifications suggests that attention-based architectures are broadly applicable across diverse NLP tasks. This aligns with the trend toward more general, transferable models in machine learning, moving away from task-specific architectures toward flexible frameworks that can excel across multiple domains.

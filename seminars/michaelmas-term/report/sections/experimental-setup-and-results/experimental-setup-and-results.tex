@@ -2,6 +2,18 @@
 
 \subsection{Datasets and Evaluation Metrics}
 
+The transformer model was evaluated on two WMT 2014 translation tasks: English-to-German (4.5 million sentence pairs with a 37,000 token vocabulary using byte-pair encoding) and English-to-French (36 million sentence pairs with a 32,000 token vocabulary). Performance was measured using the BLEU metric, with validation on newstest2013 and testing on newstest2014.
+
 \subsection{Training Details}
 
+The base model used $d_\text{model}=512$, eight attention heads, and inner feedforward dimensionality $d_{ff}=2048$, while the larger model used $d_\text{model}=1024$, 16 heads, and $d_{ff}=4096$. Training employed the Adam optimiser, using hyperparameters $\beta_1=0.9$, $\beta_2=0.98$, and $\epsilon=10^{-9}$, with a custom learning rate schedule:
+\begin{equation}
+  lrate=d_\text{model}^{-0.5}\cdot\min(step\_num^{-0.5},step\_num \cdot warmup\_steps^{-1.5}).
+\end{equation}\label{eq:lrate}
+This schedule increased the learning rate linearly during a 4,000-step warmup phase, then decreased it proportionally to the inverse square root of the step number. Regularisation included residual dropout, label smoothing, and beam search decoding. Training was conducted on eight NVIDIA P100 GPUs.
+
 \subsection{Results Analysis}
+
+The transformer demonstrated superior performance, with the base model achieving 27.3 BLEU on English-to-German and 38.1 BLEU on English-to-French, while the large model reached 28.4 and 41.0 BLEU, respectively. These results surpassed all previous single models and even ensembles, with significantly reduced training time. The base model required only about 12 hours of training for the English-to-German task.
+
+Ablation studies confirmed the importance of key architectural decisions: reducing attention heads or layer count decreased performance; replacing dot-product attention with additive attention slowed convergence; removing the scaling factor in attention calculations destabilised training; and positional encodings proved more effective than learned positional embeddings in most scenarios.
