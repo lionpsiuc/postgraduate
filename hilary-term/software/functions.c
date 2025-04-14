@@ -156,3 +156,56 @@ int MPI_Info_create(MPI_Info* info);
 int MPI_Info_free(MPI_Info* info);
 
 int MPI_Info_set(MPI_Info info, char* key, char* value);
+
+int MPI_Comm_create(MPI_Comm comm, MPI_Group group, MPI_Comm* newcomm);
+
+int MPI_Ssend(const void* buf, int count, MPI_Datatype datatype, int dest,
+              int tag, MPI_Comm comm);
+
+int MPI_Bsend(const void* buf, int count, MPI_Datatype datatype, int dest,
+              int tag, MPI_Comm comm);
+
+int MPI_Rsend(const void* buf, int count, MPI_Datatype datatype, int dest,
+              int tag, MPI_Comm comm);
+
+int MPI_Waitall(int count, MPI_Request array_of_requests[],
+                MPI_Status array_of_statuses[]);
+
+int MPI_Waitany(int count, MPI_Request array_of_requests[], int* indx,
+                MPI_Status* status);
+
+int MPI_Waitsome(int incount, MPI_Request array_of_requests[], int* outcount,
+                 int array_of_indices[], MPI_Status array_of_statuses[]);
+
+int MPI_Cancel(MPI_Request* request);
+
+int MPI_Test_cancelled(const MPI_Status* status, int* flag);
+
+int MPI_Comm_group(MPI_Comm comm, MPI_Group* group);
+
+int MPI_Group_size(MPI_Group group, int* size);
+
+int MPI_Group_rank(MPI_Group group, int* rank);
+
+int MPI_Group_union(MPI_Group group1, MPI_Group group2, MPI_Group* newgroup);
+
+int MPI_Group_intersection(MPI_Group group1, MPI_Group group2,
+                           MPI_Group* newgroup);
+
+int MPI_Group_difference(MPI_Group group1, MPI_Group group2,
+                         MPI_Group* newgroup);
+
+int MPI_Group_incl(MPI_Group group, int n, const int ranks[],
+                   MPI_Group* newgroup);
+
+int MPI_Group_excl(MPI_Group group, int n, const int ranks[],
+                   MPI_Group* newgroup);
+
+int MPI_Comm_dup(MPI_Comm comm, MPI_Comm* newcomm);
+
+int MPI_Cart_create(MPI_Comm comm_old, int ndims, const int dims[],
+                    const int periods[], int reorder, MPI_Comm* comm_cart);
+
+int MPI_Dims_create(int nnodes, int ndims, int dims[]);
+
+int MPI_Cart_coords(MPI_Comm comm, int rank, int maxdims, int coords[]);
