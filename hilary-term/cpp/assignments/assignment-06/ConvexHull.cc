@@ -4,13 +4,14 @@
  */
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 #include "ConvexHull.h"
 
 /**
- * @brief     Constructor that initializes the points from a range defined by
- *            iterators.
+ * Constructor that initializes the points from a range defined by iterators.
+ *
  * @param beg Iterator to the beginning of a Point vector.
  * @param end Iterator to the end of a Point vector.
  */
@@ -22,177 +23,308 @@ ConvexHull::ConvexHull(std::vector<Point>::iterator beg,
 }
 
 /**
- * @brief  Generates the convex hull using Andrew's monotone chain algorithm.
- * @return A vector of Points representing the convex hull vertices.
+ * Generates the convex hull using Andrew's monotone chain algorithm.
+ *
+ * This method computes the convex hull of the points stored in this object.
+ * It assumes the points are already sorted by x-coordinate (and by
+ * y-coordinate when x-coordinates are equal). If the points are not sorted,
+ * the result will not be correct.
+ *
+ * The algorithm works by building the lower and upper hulls separately and
+ * then combining them.
+ *
+ * @returns A vector of Points representing the vertices of the convex hull,
+ *          in counterclockwise order.
+ * @note    If there are fewer than three points, the hull will be the points
+ *          themselves.
  */
 std::vector<Point> ConvexHull::generate_hull() {
-
-  // Return an empty hull if there are fewer than three points
   int n = points.size();
   if (n < 3) {
+
+    // Return points as is for fewer than three points
     hull = points;
     return hull;
   }
 
   // Temporary vector to store the convex hull vertices
-  std::vector<Point> convex_hull;
+  std::vector<Point> temp_hull;
 
   // Build lower hull
-  for (const auto& point : points) {
+  for (const auto& pt : points) {
 
-    // While we have at least two points in the hull and the last three points
-    // make a non-left turn, remove the middle point of the last three
-    while (convex_hull.size() >= 2 &&
-           !cross_prod(convex_hull[convex_hull.size() - 2], convex_hull.back(),
-                       point)) {
-      convex_hull.pop_back();
+    // Remove points that make a right turn or are collinear
+    while (temp_hull.size() >= 2 &&
+           cross_prod(temp_hull[temp_hull.size() - 2], temp_hull.back(), pt)) {
+      temp_hull.pop_back();
     }
-    convex_hull.push_back(point);
+
+    temp_hull.push_back(pt);
   }
 
   // Build upper hull
-  size_t lower_hull_size = convex_hull.size();
-  for (auto it = points.rbegin(); it != points.rend(); ++it) {
+  size_t t = temp_hull.size();
 
-    // While we have at least two points in the upper hull and the last three
-    // points make a non-left turn, remove the middle point of the last three
-    while (convex_hull.size() > lower_hull_size &&
-           !cross_prod(convex_hull[convex_hull.size() - 2], convex_hull.back(),
-                       *it)) {
-      convex_hull.pop_back();
+  // Process points in reverse order for upper hull
+  for (int i = n - 2; i >= 0; --i) {
+    const auto& pt = points[i];
+
+    // Remove points that make a right turn or are collinear
+    while (temp_hull.size() >= t + 1 &&
+           cross_prod(temp_hull[temp_hull.size() - 2], temp_hull.back(), pt)) {
+      temp_hull.pop_back();
     }
-    convex_hull.push_back(*it);
+
+    temp_hull.push_back(pt);
   }
 
-  // Remove the last point since it's the same as the first point of the lower
-  // hull
-  convex_hull.pop_back();
+  // Remove the duplicate starting point if hull has more than one point
+  if (temp_hull.size() > 1) {
+    temp_hull.pop_back();
+  }
 
-  // Update the hull member variable
-  hull = convex_hull;
-
+  hull = temp_hull;
   return hull;
 }
 
 /**
- * @brief       Merges this convex hull with another hull on its right.
- * @param right The ConvexHull to merge with.
+ * Merges this convex hull with another hull on its right.
+ *
+ * This modifies the current hull to become the convex hull of the union of
+ * points from both hulls. The algorithm finds upper and lower tangent lines
+ * between the hulls and uses them to determine which points to keep.
+ *
+ * @param right The ConvexHull to merge with, which should generally contain
+ *              points that are to the right of this hull's points.
  */
 void ConvexHull::merge_to_right(ConvexHull& right) {
-
-  // If either hull is empty, return the other
-  if (hull.empty()) {
-    hull = right.hull;
+  // Handle empty hulls
+  if (this->hull.empty()) {
+    this->hull = right.hull;
+    // Steal points if right hull is not empty
+    if (!right.hull.empty()) {
+      this->points.insert(this->points.end(),
+                          std::make_move_iterator(right.points.begin()),
+                          std::make_move_iterator(right.points.end()));
+      right.points.clear();
+      right.hull.clear();
+    }
     return;
   }
   if (right.hull.empty()) {
+    // Nothing to merge if right hull is empty
     return;
   }
 
-  // Find the rightmost point of the left hull
+  // Find rightmost point on left hull and leftmost point on right hull
   auto left_rightmost = std::max_element(
-      hull.begin(), hull.end(),
+      this->hull.begin(), this->hull.end(),
       [](const Point& a, const Point& b) { return a.x < b.x; });
-  int left_rightmost_idx = std::distance(hull.begin(), left_rightmost);
+  int   left_rightmost_idx = std::distance(this->hull.begin(), left_rightmost);
+  Point A                  = this->hull[left_rightmost_idx];
 
-  // Find the leftmost point of the right hull
   auto right_leftmost = std::min_element(
       right.hull.begin(), right.hull.end(),
       [](const Point& a, const Point& b) { return a.x < b.x; });
-  int right_leftmost_idx = std::distance(right.hull.begin(), right_leftmost);
+  int   right_leftmost_idx = std::distance(right.hull.begin(), right_leftmost);
+  Point B                  = right.hull[right_leftmost_idx];
 
-  /*
-   * Find the upper tangent
-   */
+  // Define vertical line between hulls
+  double x_mid = (A.x + B.x) / 2.0;
 
-  // Some required variables
-  int  upper_left_idx  = left_rightmost_idx;
-  int  upper_right_idx = right_leftmost_idx;
-  bool upper_found     = false;
-
-  while (!upper_found) {
-    upper_found = true;
-
-    // Check if we can move counterclockwise on the left hull
-    while (true) {
-      int next_idx = (upper_left_idx + 1) % hull.size();
-      if (cross_prod(right.hull[upper_right_idx], hull[upper_left_idx],
-                     hull[next_idx])) {
-        upper_left_idx = next_idx;
-        upper_found    = false;
-      } else {
-        break;
-      }
-    }
-
-    // Check if we can move clockwise on the right hull
-    while (true) {
-      int next_idx =
-          (upper_right_idx + right.hull.size() - 1) % right.hull.size();
-      if (!cross_prod(hull[upper_left_idx], right.hull[upper_right_idx],
-                      right.hull[next_idx])) {
-        upper_right_idx = next_idx;
-        upper_found     = false;
-      } else {
-        break;
-      }
-    }
+  // Calculate initial line parameters
+  double m, c, y_mid;
+  if (B.x - A.x == 0) {
+    // Handle vertical line case
+    m     = std::numeric_limits<double>::infinity();
+    c     = A.x;
+    y_mid = (A.y + B.y) / 2.0;
+  } else {
+    m     = (B.y - A.y) / (B.x - A.x);
+    c     = A.y - m * A.x;
+    y_mid = m * x_mid + c;
   }
 
-  /*
-   * Find the lower tangent
-   */
+  // Find upper tangent
+  int  upper_left_idx      = left_rightmost_idx;
+  int  upper_right_idx     = right_leftmost_idx;
+  bool found_upper_tangent = false;
 
-  // Some required variables
-  int  lower_left_idx  = left_rightmost_idx;
-  int  lower_right_idx = right_leftmost_idx;
-  bool lower_found     = false;
+  while (!found_upper_tangent) {
+    found_upper_tangent         = true;
+    int current_upper_right_idx = upper_right_idx;
 
-  while (!lower_found) {
-    lower_found = true;
+    // Check all points on right hull for better upper tangent
+    for (size_t i = 0; i < right.hull.size(); ++i) {
+      int next_right_idx_candidate =
+          (current_upper_right_idx + i) % right.hull.size();
+      if (next_right_idx_candidate == upper_right_idx && i > 0)
+        continue;
 
-    // Check if we can move clockwise on the left hull
-    while (true) {
-      int next_idx = (lower_left_idx + hull.size() - 1) % hull.size();
-      if (!cross_prod(right.hull[lower_right_idx], hull[lower_left_idx],
-                      hull[next_idx])) {
-        lower_left_idx = next_idx;
-        lower_found    = false;
+      Point  next_right = right.hull[next_right_idx_candidate];
+      double next_y_mid_val;
+
+      // Calculate intersection y value
+      if (next_right.x - this->hull[upper_left_idx].x == 0) {
+        next_y_mid_val = (this->hull[upper_left_idx].y + next_right.y) / 2.0;
       } else {
-        break;
+        double next_m = (next_right.y - this->hull[upper_left_idx].y) /
+                        (next_right.x - this->hull[upper_left_idx].x);
+        double next_c = this->hull[upper_left_idx].y -
+                        next_m * this->hull[upper_left_idx].x;
+        next_y_mid_val = next_m * x_mid + next_c;
+      }
+
+      // For upper tangent, maximize y_mid
+      if (next_y_mid_val > y_mid) {
+        upper_right_idx     = next_right_idx_candidate;
+        y_mid               = next_y_mid_val;
+        found_upper_tangent = false;
       }
     }
 
-    // Check if we can move counterclockwise on the right hull
-    while (true) {
-      int next_idx = (lower_right_idx + 1) % right.hull.size();
-      if (cross_prod(hull[lower_left_idx], right.hull[lower_right_idx],
-                     right.hull[next_idx])) {
-        lower_right_idx = next_idx;
-        lower_found     = false;
+    // Check left hull for better upper tangent
+    Point C_candidate     = right.hull[upper_right_idx];
+    bool  changed_on_left = false;
+    for (size_t i = 0; i < this->hull.size(); ++i) {
+      int next_left_idx_candidate =
+          (upper_left_idx + this->hull.size() - i) % this->hull.size();
+      if (next_left_idx_candidate == upper_left_idx && i > 0)
+        continue;
+
+      Point  next_left = this->hull[next_left_idx_candidate];
+      double next_y_mid_val;
+
+      // Calculate intersection y value
+      if (C_candidate.x - next_left.x == 0) {
+        next_y_mid_val = (next_left.y + C_candidate.y) / 2.0;
       } else {
-        break;
+        double next_m =
+            (C_candidate.y - next_left.y) / (C_candidate.x - next_left.x);
+        double next_c  = next_left.y - next_m * next_left.x;
+        next_y_mid_val = next_m * x_mid + next_c;
+      }
+
+      // For upper tangent, maximize y_mid
+      if (next_y_mid_val > y_mid) {
+        upper_left_idx      = next_left_idx_candidate;
+        y_mid               = next_y_mid_val;
+        found_upper_tangent = false;
+        changed_on_left     = true;
       }
     }
+    if (changed_on_left)
+      found_upper_tangent = false;
   }
 
-  // Merge the hulls using the tangent points
+  // Find lower tangent (similar to upper but we minimize y_mid)
+  int  lower_left_idx      = left_rightmost_idx;
+  int  lower_right_idx     = right_leftmost_idx;
+  bool found_lower_tangent = false;
+
+  // Reset initial intersection for lower tangent
+  if (B.x - A.x == 0) {
+    y_mid = (A.y + B.y) / 2.0;
+  } else {
+    m     = (B.y - A.y) / (B.x - A.x);
+    c     = A.y - m * A.x;
+    y_mid = m * x_mid + c;
+  }
+
+  while (!found_lower_tangent) {
+    found_lower_tangent        = true;
+    int current_lower_left_idx = lower_left_idx;
+
+    // Check left hull for better lower tangent
+    for (size_t i = 0; i < this->hull.size(); ++i) {
+      int next_left_idx_candidate =
+          (current_lower_left_idx + i) % this->hull.size();
+      if (next_left_idx_candidate == lower_left_idx && i > 0)
+        continue;
+
+      Point  next_left = this->hull[next_left_idx_candidate];
+      double next_y_mid_val;
+
+      // Calculate intersection y value
+      if (right.hull[lower_right_idx].x - next_left.x == 0) {
+        next_y_mid_val = (next_left.y + right.hull[lower_right_idx].y) / 2.0;
+      } else {
+        double next_m = (right.hull[lower_right_idx].y - next_left.y) /
+                        (right.hull[lower_right_idx].x - next_left.x);
+        double next_c  = next_left.y - next_m * next_left.x;
+        next_y_mid_val = next_m * x_mid + next_c;
+      }
+
+      // For lower tangent, minimize y_mid
+      if (next_y_mid_val < y_mid) {
+        lower_left_idx      = next_left_idx_candidate;
+        y_mid               = next_y_mid_val;
+        found_lower_tangent = false;
+      }
+    }
+
+    // Check right hull for better lower tangent
+    Point D_candidate      = this->hull[lower_left_idx];
+    bool  changed_on_right = false;
+    for (size_t i = 0; i < right.hull.size(); ++i) {
+      int next_right_idx_candidate =
+          (lower_right_idx + right.hull.size() - i) % right.hull.size();
+      if (next_right_idx_candidate == lower_right_idx && i > 0)
+        continue;
+
+      Point  next_right = right.hull[next_right_idx_candidate];
+      double next_y_mid_val;
+
+      // Calculate intersection y value
+      if (next_right.x - D_candidate.x == 0) {
+        next_y_mid_val = (D_candidate.y + next_right.y) / 2.0;
+      } else {
+        double next_m =
+            (next_right.y - D_candidate.y) / (next_right.x - D_candidate.x);
+        double next_c  = D_candidate.y - next_m * D_candidate.x;
+        next_y_mid_val = next_m * x_mid + next_c;
+      }
+
+      // For lower tangent, minimize y_mid
+      if (next_y_mid_val < y_mid) {
+        lower_right_idx     = next_right_idx_candidate;
+        y_mid               = next_y_mid_val;
+        found_lower_tangent = false;
+        changed_on_right    = true;
+      }
+    }
+    if (changed_on_right)
+      found_lower_tangent = false;
+  }
+
+  // Create the merged hull by walking around both hulls
   std::vector<Point> merged_hull;
 
-  // Add points from the left hull and lower tangent to the upper tangent
-  size_t idx = lower_left_idx;
-  do {
-    merged_hull.push_back(hull[idx]);
-    idx = (idx + 1) % hull.size();
-  } while (idx != (upper_left_idx + 1) % hull.size());
+  // Add points from left hull: upper tangent to lower tangent (clockwise)
+  int current_idx = upper_left_idx;
+  while (true) {
+    merged_hull.push_back(this->hull[current_idx]);
+    if (current_idx == lower_left_idx)
+      break;
+    current_idx = (current_idx + 1) % this->hull.size();
+  }
 
-  // Add points from the right hull and the upper tangent to the lower tangent
-  idx = upper_right_idx;
-  do {
-    merged_hull.push_back(right.hull[idx]);
-    idx = (idx + 1) % right.hull.size();
-  } while (idx != (lower_right_idx + 1) % right.hull.size());
+  // Add points from right hull: lower tangent to upper tangent (clockwise)
+  current_idx = lower_right_idx;
+  while (true) {
+    merged_hull.push_back(right.hull[current_idx]);
+    if (current_idx == upper_right_idx)
+      break;
+    current_idx = (current_idx + 1) % right.hull.size();
+  }
 
-  // Update the hull
-  hull = merged_hull;
+  // Update hull and steal points from right
+  this->hull = merged_hull;
+  this->points.insert(this->points.end(),
+                      std::make_move_iterator(right.points.begin()),
+                      std::make_move_iterator(right.points.end()));
+
+  // Clear right hull and points
+  right.points.clear();
+  right.hull.clear();
 }

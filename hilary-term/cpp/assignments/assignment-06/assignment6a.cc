@@ -12,9 +12,29 @@
 #include <thread>
 #include <vector>
 
+/**
+ * Launch policy for asynchronous tasks.
+ *
+ * Controls whether tasks run concurrently with the caller or are deferred until
+ * explicitly requested. Set to async for immediate concurrent execution.
+ */
 const auto policy = std::launch::async;
 // const auto policy = std::launch::deferred;
 
+/**
+ * Compares different implementations of parallel dot product calculations.
+ *
+ * Generates two random vectors of doubles and calculates their dot product
+ * (inner product) using three different methods:
+ *
+ *   1. Serial computation with std::inner_product.
+ *   2. Parallel computation with std::async.
+ *   3. Parallel computation with std::packaged_task and std::thread.
+ *
+ * Times each approach and prints the results to standard output.
+ *
+ * @returns 0 upon successful completion.
+ */
 int main(void) {
   const int           n{50'000'000};
   std::atomic<double> dot_prod{0};
@@ -40,7 +60,14 @@ int main(void) {
   std::cout << "Using " << thread_count
             << " threads for parallel computation\n\n";
 
-  // Generic lambda expression
+  /**
+   * Calculates partial dot product between segments of two vectors.
+   *
+   * @param it Iterator to the beginning of the first vector segment.
+   * @param it2 Iterator to the end of the first vector segment.
+   * @param it3 Iterator to the beginning of the second vector segment.
+   * @returns Dot product of the specified segments.
+   */
   auto partial_dot = [](auto it, auto it2, auto it3) {
     return std::inner_product(it, it2, it3, 0.0);
   };

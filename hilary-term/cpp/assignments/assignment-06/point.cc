@@ -10,28 +10,37 @@
 #include "point.h"
 
 /**
- * @brief     Equality operator for Point class. Compares x and y coordinates of
- *            two points.
+ * Equality operator for Point class. Compares x and y coordinates of two
+ * points.
+ *
  * @param rhs The right-hand side point to compare with.
- * @return    True if points have identical coordinates, false otherwise.
+ * @returns   True if points have identical coordinates, false otherwise.
  */
 bool Point::operator==(const Point& rhs) {
   return (x == rhs.x) && (y == rhs.y);
 }
 
 /**
- * @brief     Writes a vector of points to a file. Each point is written on a
- *            new line with the format defined by the Point's << operator in
- *            point.h.
- * @param fn  The filename to write to.
- * @param pts Vector of points to write.
+ * Writes a vector of points to a specified file, ensuring the polygon is
+ * closed.
+ *
+ * @param fn  The filename.
+ * @param pts The vector of points to write. The function will append the first
+ *            point to the end of this (copied) vector to close the polygon for
+ *            plotting.
  */
-void write_to_file(std::string fn, std::vector<Point> pts) {
+void write_to_file(std::string fn, std::vector<Point> pts) { // pts is a copy
   std::ofstream outfile(fn);
   if (!outfile) {
     std::cerr << "Error: Could not open file " << fn << std::endl;
     return;
   }
+
+  // If there are points, add the first point to the end of the vector
+  if (!pts.empty()) {
+    pts.push_back(pts.front());
+  }
+
   for (const auto& pt : pts) {
     outfile << pt << '\n';
   }
@@ -39,24 +48,23 @@ void write_to_file(std::string fn, std::vector<Point> pts) {
 }
 
 /**
- * @brief    Calculates cross product to determine the orientation of three
- *           points.
- * @param p1 First point
- * @param p2 Second point
- * @param p3 Third point
- * @return   True if p3 is to the left of the line from p1 to p2 (i.e.,
- *           counterclockwise turn)
+ * Calculates cross product to determine the orientation of three points.
+ *
+ * @param p1 First point (origin for the two vectors).
+ * @param p2 Second point (defines the first vector).
+ * @param p3 Third point (defines the second vector).
+ * @returns  True if the cross product (p2-p1) x (p3-p1) is negative or zero.
  */
 bool cross_prod(Point p1, Point p2, Point p3) {
   double cross = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
-  return cross > 0;
+  return cross <= 0;
 }
 
 /**
- * @brief        Sorts points by x-coordinate in ascending order; however, if
- *               x-coordinates are equal, then they will be sorted by the
- *               y-coordinate instead.
- * @param points Vector of points to be sorted
+ * Sorts points by x-coordinate in ascending order; however, if x-coordinates
+ * are equal, then they will be sorted by the y-coordinate instead.
+ *
+ * @param points Vector of points to be sorted.
  */
 void sort_points(std::vector<Point>& points) {
   std::sort(points.begin(), points.end(), [](const Point& a, const Point& b) {

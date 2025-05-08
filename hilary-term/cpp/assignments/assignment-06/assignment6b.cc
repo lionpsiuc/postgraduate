@@ -1,7 +1,8 @@
 /**
- * @file  assignment5b.cc
+ * @file  assignment6b.cc
  * @brief Main function demonstrating the ConvexHull class.
  */
+
 #include <algorithm>
 #include <chrono>
 #include <fstream>
@@ -28,7 +29,7 @@ const auto policy = std::launch::async;
 int main(void) {
 
   // You can change number of points if you want for timing purposes
-  const int          n{10'000'000};
+  const int          n{100};
   std::vector<Point> points(n);
 
   auto gaussian_rv = std::bind(std::normal_distribution<>{0, 1}, std::ref(rng));
