@@ -11,6 +11,11 @@
 #include <iomanip>
 #include <vector>
 
+#ifdef MPI
+#include <boost/mpi.hpp>
+#include <boost/serialization/vector.hpp>
+#endif
+
 /**
  * Simple structure to store coordinates of a point on the grid.
  */
@@ -23,6 +28,14 @@ struct Point {
   Point(double inx, double iny) : x{inx}, y{iny} {};
 
   bool operator==(const Point& rhs);
+
+#ifdef MPI
+  // Serialization support for Boost.MPI
+  template <typename Archive>
+  void serialize(Archive& ar, unsigned /*ver*/) {
+    ar & x & y;
+  }
+#endif
 };
 
 /**

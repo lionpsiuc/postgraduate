@@ -1,22 +1,23 @@
-# Compiler
-CXX      = g++
+XX      = g++
+MPICXX   = mpicxx
 
-# Flags
-CXXFLAGS = -std=c++23 -Wall -Wextra
-LDFLAGS  = -ltbb
+COMMON_FLAGS = -std=c++23 -Wall -Wextra
+CXXFLAGS     = $(COMMON_FLAGS)
+LDFLAGS      = -ltbb
+MPI_CXXFLAGS = $(COMMON_FLAGS) -DMPI
+MPI_LIBS     = -lboost_mpi -lboost_serialization
 
-# Targets
-all: assignment6a assignment6b
+all: assignment6a assignment6b assignment6c
 
-# Rule for assignment6a (dot product calculation)
 assignment6a: assignment6a.cc
 	$(CXX) $(CXXFLAGS) -o assignment6a assignment6a.cc $(LDFLAGS)
 
-# Rule for assignment6b (convex hull with dependencies)
 assignment6b: assignment6b.cc ConvexHull.cc point.cc
 	$(CXX) $(CXXFLAGS) -o assignment6b assignment6b.cc ConvexHull.cc point.cc $(LDFLAGS)
 
-# Clean target
+assignment6c:
+	$(MPICXX) $(MPI_CXXFLAGS) -o assignment6c assignment6c.cc ConvexHull.cc point.cc $(MPI_LIBS)
+
 .PHONY: clean
 clean:
-	$(RM) assignment6a assignment6b *.txt *.png
+	$(RM) assignment6a assignment6b assignment6c *.txt *.png

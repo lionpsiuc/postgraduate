@@ -9,8 +9,14 @@
 
 #include "point.h"
 
+#ifdef MPI
+#include <boost/mpi/packed_iarchive.hpp>
+#include <boost/mpi/packed_oarchive.hpp>
+#include <boost/serialization/export.hpp>
+#endif
+
 /**
- * Equality operator for Point class. Compares x and y coordinates of two
+ * Equality operator for Point class. Compares x- and y-coordinates of two
  * points.
  *
  * @param rhs The right-hand side point to compare with.
@@ -75,3 +81,10 @@ void sort_points(std::vector<Point>& points) {
     return a.x < b.x; // Primary sort by x-coordinate
   });
 }
+
+#ifdef MPI
+template void Point::serialize<boost::mpi::packed_oarchive>(
+    boost::mpi::packed_oarchive& ar, unsigned version);
+template void Point::serialize<boost::mpi::packed_iarchive>(
+    boost::mpi::packed_iarchive& ar, unsigned version);
+#endif

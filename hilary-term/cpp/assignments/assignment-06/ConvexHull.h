@@ -108,6 +108,15 @@ public:
    */
   std::vector<Point> get_hull() const { return hull; }
 
+#ifdef MPI
+  /**
+   * Moves the input vector of points into the hull member variable.
+   *
+   * @param in Vector of points to be moved into the hull.
+   */
+  void move_hull(std::vector<Point>&& in) { hull = std::move(in); }
+#endif
+
 private:
   std::vector<Point> points; ///< Input points for the convex hull algorithm
   std::vector<Point> hull;   ///< Vertices of the computed convex hull

@@ -29,7 +29,7 @@ const auto policy = std::launch::async;
 int main(void) {
 
   // You can change number of points if you want for timing purposes
-  const int          n{100};
+  const int          n{100000};
   std::vector<Point> points(n);
 
   auto gaussian_rv = std::bind(std::normal_distribution<>{0, 1}, std::ref(rng));
@@ -56,7 +56,7 @@ int main(void) {
 
   auto end = std::chrono::steady_clock::now();
 
-  std::cout << "Serial time: "
+  std::cout << "Serial: "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end -
                                                                      start)
                    .count()
@@ -120,7 +120,7 @@ int main(void) {
   write_to_file(std::string("after_second_merge.txt"), CH_left.get_hull());
 
   end = std::chrono::steady_clock::now();
-  std::cout << "Parallelised time: "
+  std::cout << "Parallelised: "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end -
                                                                      start)
                    .count()

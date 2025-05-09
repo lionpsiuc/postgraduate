@@ -63,10 +63,10 @@ int main(void) {
   /**
    * Calculates partial dot product between segments of two vectors.
    *
-   * @param it Iterator to the beginning of the first vector segment.
-   * @param it2 Iterator to the end of the first vector segment.
-   * @param it3 Iterator to the beginning of the second vector segment.
-   * @returns Dot product of the specified segments.
+   * @param   it  Iterator to the beginning of the first vector segment.
+   * @param   it2 Iterator to the end of the first vector segment.
+   * @param   it3 Iterator to the beginning of the second vector segment.
+   * @returns     Dot product of the specified segments.
    */
   auto partial_dot = [](auto it, auto it2, auto it3) {
     return std::inner_product(it, it2, it3, 0.0);
